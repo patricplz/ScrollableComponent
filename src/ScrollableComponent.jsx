@@ -1,3 +1,4 @@
+import { useImperativeHandle } from 'react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 /**
@@ -15,7 +16,8 @@ const ScrollableComponent = ({
   horizontalScroll = false,
   onDragStart,
   onDrag,
-  onDragEnd
+  onDragEnd,
+  childRef,
 }) => {
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -24,6 +26,8 @@ const ScrollableComponent = ({
   const [scrollLeft, setScrollLeft] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const [isInteractiveElement, setIsInteractiveElement] = useState(false);
+
+
 
   // Verifica si el evento se originó en un elemento interactivo
   const checkIfInteractive = useCallback((target) => {
@@ -79,6 +83,11 @@ const ScrollableComponent = ({
 
   }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag]);
 
+  const resetPosition = () =>{
+    containerRef.current.scrollTop = 0;
+    containerRef.current.scrollLeft = 0;
+  }
+
   // Finalizar el arrastre
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -114,6 +123,15 @@ const ScrollableComponent = ({
     overflowY: verticalScroll ? 'auto' : 'hidden',
     userSelect: 'none',
   };
+
+
+    //Function for pass functions to be triggered on father
+    useImperativeHandle(childRef, () => {
+      return {
+        resetPosition,
+      };
+    }, []);
+  
 
   return (
     <div
