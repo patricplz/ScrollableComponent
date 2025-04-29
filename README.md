@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# 🖱️ ScrollableComponent
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A flexible React component that enables both **horizontal and vertical drag-to-scroll** behavior using the mouse. It’s perfect for scenarios like scrollable tables, galleries, or large content areas.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+- Smooth horizontal and/or vertical scroll by dragging with the mouse.
+- Ignores drags on interactive elements (like buttons, inputs, or links).
+- Allows custom behavior via optional `onDragStart`, `onDrag`, and `onDragEnd` callbacks.
+- Fully customizable with Tailwind or regular CSS.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧩 Example: Scrollable Table
 
-### `npm test`
+```jsx
+<div className="overflow-hidden table-container">
+  <ScrollableComponent horizontalScroll={true} verticalScroll={true}>
+    <table className="min-w-[1000px]">
+      {/* your table rows here */}
+    </table>
+  </ScrollableComponent>
+</div>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+⚙️ Props
 
-### `npm run build`
+Prop	Type	Description
+children	React.ReactNode	The content to render inside the scrollable container.
+className	string	Additional CSS classes for styling the outer container.
+horizontalScroll	boolean	Enables horizontal dragging and scrolling. Default: false.
+verticalScroll	boolean	Enables vertical dragging and scrolling. Default: false.
+onDragStart	(event) => void	Optional callback triggered when dragging starts.
+onDrag	(event) => void	Optional callback triggered while dragging.
+onDragEnd	() => void	Optional callback triggered when dragging ends.
+💡 Usage Tips
+Wrap the component with a container that uses overflow-hidden to prevent scrollbars from appearing.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Use it to enhance table, div, img, or any other large content that needs to be scrollable by dragging.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Tailwind's min-w-[...] classes work great for forcing scroll.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+📦 How It Works
+Uses mousedown, mousemove, and mouseup under the hood.
 
-### `npm run eject`
+Calculates mouse position deltas to apply custom scroll.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Applies user-select: none during drag to prevent unwanted text selection.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Ignores interactive elements like <input>, <button>, <a>, <textarea>, and those with tabindex or role.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+🧼 Auto Cleanup
+All global event listeners are automatically removed when the component unmounts.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+📄 License
+MIT — free to use and modify.
