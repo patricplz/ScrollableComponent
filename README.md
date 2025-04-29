@@ -27,14 +27,16 @@ A flexible React component that enables both **horizontal and vertical drag-to-s
 
 ⚙️ Props
 
-Prop	Type	Description
-children	React.ReactNode	The content to render inside the scrollable container.
-className	string	Additional CSS classes for styling the outer container.
-horizontalScroll	boolean	Enables horizontal dragging and scrolling. Default: false.
-verticalScroll	boolean	Enables vertical dragging and scrolling. Default: false.
-onDragStart	(event) => void	Optional callback triggered when dragging starts.
-onDrag	(event) => void	Optional callback triggered while dragging.
-onDragEnd	() => void	Optional callback triggered when dragging ends.
+| Prop             | Type                  | Description                                                              |
+|------------------|-----------------------|--------------------------------------------------------------------------|
+| `children`       | `React.ReactNode`     | The content to render inside the scrollable container.                   |
+| `className`      | `string`              | Additional CSS classes for styling the outer container.                  |
+| `horizontalScroll` | `boolean`           | Enables horizontal dragging and scrolling. Default: `false`.             |
+| `verticalScroll`   | `boolean`           | Enables vertical dragging and scrolling. Default: `false`.               |
+| `onDragStart`    | `(event) => void`     | Optional callback triggered when dragging starts.                        |
+| `onDrag`         | `(event) => void`     | Optional callback triggered while dragging.                              |
+| `onDragEnd`      | `() => void`          | Optional callback triggered when dragging ends.                          |
+
 💡 Usage Tips
 Wrap the component with a container that uses overflow-hidden to prevent scrollbars from appearing.
 
