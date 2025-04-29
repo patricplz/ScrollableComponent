@@ -8,7 +8,15 @@ import { useState, useRef, useCallback, useEffect } from 'react';
  * @param {boolean} props.verticalScroll - Permite habilitar también el scroll vertical.
  * @returns {JSX.Element} Componente ScrollableComponent.
  */
-const ScrollableComponent = ({ children, className = '', verticalScroll = false }) => {
+const ScrollableComponent = ({ 
+  children, 
+  className = '',
+  verticalScroll = false, 
+  horizontalScroll = false,
+  onDragStart,
+  onDrag,
+  onDragEnd
+}) => {
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -46,28 +54,36 @@ const ScrollableComponent = ({ children, className = '', verticalScroll = false 
     setStartY(e.pageY - containerRef.current.offsetTop);
     setScrollLeft(containerRef.current.scrollLeft);
     setScrollTop(containerRef.current.scrollTop);
+
+    if (onDragStart) onDragStart(e);
+
     e.preventDefault();
-  }, [checkIfInteractive]);
+  }, [checkIfInteractive, onDragStart]);
 
   // Mover durante el arrastre
   const handleMouseMove = useCallback((e) => {
     if (!isDragging || isInteractiveElement) return;
 
+    if (horizontalScroll) {
     const x = e.pageX - containerRef.current.offsetLeft;
     const walkX = (x - startX) * 1.2; // Multiplicador para ajustar sensibilidad
     containerRef.current.scrollLeft = scrollLeft - walkX;
-
+    }
     if (verticalScroll) {
       const y = e.pageY - containerRef.current.offsetTop;
       const walkY = (y - startY) * 1.2;
       containerRef.current.scrollTop = scrollTop - walkY;
     }
-  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll]);
+
+    if (onDrag) onDrag(e);
+
+  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag]);
 
   // Finalizar el arrastre
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-  }, []);
+    if (onDragEnd) onDragEnd();
+  }, [onDragEnd]);
 
   // Prevenir el comportamiento predeterminado del clic derecho durante el arrastre
   const handleContextMenu = useCallback((e) => {
@@ -94,7 +110,7 @@ const ScrollableComponent = ({ children, className = '', verticalScroll = false 
 
   // Estilos dinámicos
   const scrollStyle = {
-    overflowX: 'auto',
+    overflowX: horizontalScroll ? 'auto' : 'hidden',
     overflowY: verticalScroll ? 'auto' : 'hidden',
     userSelect: 'none',
   };

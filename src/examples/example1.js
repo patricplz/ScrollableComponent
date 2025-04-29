@@ -10,7 +10,7 @@ const Example1 = () => {
       <h1 className="text-2xl font-bold mb-4">Tabla con Scroll Horizontal</h1>
 
       <div className="overflow-hidden table-container">
-        <ScrollableComponent className="" verticalScroll={true}>
+        <ScrollableComponent className="" horizontalScroll={true} verticalScroll={true}>
           <table className="">
             <thead className="bg-gray-200">
               <tr>
