@@ -23,6 +23,7 @@ A flexible React component that enables both **horizontal and vertical drag-to-s
     </table>
   </ScrollableComponent>
 </div>
+```
 
 ⚙️ Props
 
