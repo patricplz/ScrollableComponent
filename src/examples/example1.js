@@ -1,17 +1,53 @@
 import React, { useEffect, useState, useRef } from 'react';
-import ScrollableComponent from '../ScrollableComponent';
+import ScrollableComponent from '../ScrollableTest';
 import '../output.css';
 
 const Example1 = () => {
+  const scrollRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const totalRows = 100;
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    // Resetear posición del scroll
+    scrollRef.current?.resetPosition();
+  };
+
+  const data = Array.from({ length: totalRows });
+
+  const paginatedData = data.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const [isCtrlDraggingFromChild, setIsCtrlDraggingFromChild] = useState(false);
+
+ const handleCtrlDragChange = (isCtrlDragging) => {
+    if (isCtrlDragging) {
+      console.log('¡El usuario está arrastrando con Ctrl!');
+      // Aquí podrías ejecutar OTRA FUNCIÓN si onCtrlDragChange es true
+    } else {
+      console.log('El usuario ha dejado de arrastrar con Ctrl.');
+    }
+  };
 
   return (
-    
-    <div className="app-container relative min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Tabla con Scroll Horizontal</h1>
+    <div className="app-container relative min-h-screen p-4">
+      <h1 className="text-2xl font-bold mb-4">Tabla con Scroll Horizontal y Paginación</h1>
 
-      <div className="overflow-hidden table-container">
-        <ScrollableComponent className="" horizontalScroll={true} verticalScroll={true}>
-          <table className="">
+      <div className="overflow-hidden table-container border rounded shadow">
+        <ScrollableComponent
+          ref={scrollRef}
+          className="max-h-[300px]"
+          horizontalScroll={true}
+          verticalScroll={true}
+          isDragable={true}
+          onCtrlDragChange={handleCtrlDragChange}
+        >
+          <table className="w-full">
             <thead className="bg-gray-200">
               <tr>
                 <th>ID</th>
@@ -26,68 +62,43 @@ const Example1 = () => {
               </tr>
             </thead>
             <tbody>
-              {Array.from({ length: 100 }).map((_, index) => (
-                <tr
-                  key={index}
-                >
-                  <td>{index + 1}</td>
-                  <td>Usuario {index + 1}</td>
-                  <td>usuario{index + 1}@ejemplo.com</td>
-                  <td>+34 600 12 34 {index.toString().padStart(2, '0')}</td>
-                  <td>Ciudad {index + 1}</td>
-                  <td>País {index + 1}</td>
-                  <td>Desarrollador</td>
-                  <td>Empresa {index + 1}</td>
-                  <td>
-                    <button onClick={() => alert(`Editar usuario ${index + 1}`)}>Editar</button>
-                    <button onClick={() => alert(`Eliminar usuario ${index + 1}`)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
+              {paginatedData.map((_, index) => {
+                const actualIndex = (currentPage - 1) * rowsPerPage + index;
+                return (
+                  <tr key={actualIndex}>
+                    <td>{actualIndex + 1}</td>
+                    <td>Usuario {actualIndex + 1}</td>
+                    <td>usuario{actualIndex + 1}@ejemplo.com</td>
+                    <td>+34 600 12 34 {actualIndex.toString().padStart(2, '0')}</td>
+                    <td>Ciudad {actualIndex + 1}</td>
+                    <td>País {actualIndex + 1}</td>
+                    <td>Desarrollador</td>
+                    <td>Empresa {actualIndex + 1}</td>
+                    <td>
+                      <button onClick={() => alert(`Editar usuario ${actualIndex + 1}`)}>Editar</button>
+                      <button onClick={() => alert(`Eliminar usuario ${actualIndex + 1}`)}>Eliminar</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </ScrollableComponent>
       </div>
 
-      <h2 className="text-xl font-semibold mt-10 mb-2">Versión con scroll vertical y horizontal</h2>
-      <div className="overflow-hidden table-container">
-        <ScrollableComponent className="" verticalScroll={true}>
-        <table className="">
-            <thead className="bg-gray-200">
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Ciudad</th>
-                <th>País</th>
-                <th>Ocupación</th>
-                <th>Empresa</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 100 }).map((_, index) => (
-                <tr
-                  key={index}
-                >
-                  <td>{index + 1}</td>
-                  <td>Usuario {index + 1}</td>
-                  <td>usuario{index + 1}@ejemplo.com</td>
-                  <td>+34 600 12 34 {index.toString().padStart(2, '0')}</td>
-                  <td>Ciudad {index + 1}</td>
-                  <td>País {index + 1}</td>
-                  <td>Desarrollador</td>
-                  <td>Empresa {index + 1}</td>
-                  <td>
-                    <button onClick={() => alert(`Editar usuario ${index + 1}`)}>Editar</button>
-                    <button onClick={() => alert(`Eliminar usuario ${index + 1}`)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollableComponent>
+      {/* Paginador */}
+      <div className="flex justify-center gap-2 mt-4">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i + 1)}
+            className={`px-3 py-1 border rounded ${
+              currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-white text-black'
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
       </div>
     </div>
   );

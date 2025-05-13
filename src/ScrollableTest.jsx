@@ -24,8 +24,7 @@ const ScrollableComponent = ({
   onDrag,
   onDragEnd,
   childRef,
-  isDragable = false,
-  onCtrlDragChange 
+  isDragable = false
 }) => {
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -34,8 +33,11 @@ const ScrollableComponent = ({
   const [scrollLeft, setScrollLeft] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const [isInteractiveElement, setIsInteractiveElement] = useState(false);
-  const [isCtrlDragging, setIsCtrlDragging] = useState(false); 
+  const shouldDragWithCtrl = useCallback((event) => {
+    return isDragable && event.ctrlKey;
+  }, [isDragable]);
 
+  // Verifica si el evento se originó en un elemento interactivo
   const checkIfInteractive = useCallback((target) => {
     const interactiveElements = ['INPUT', 'SELECT', 'BUTTON', 'TEXTAREA', 'A'];
     let element = target;
@@ -51,14 +53,15 @@ const ScrollableComponent = ({
     return false;
   }, []);
 
+  // Iniciar el arrastre
   const handleMouseDown = useCallback((e) => {
     if (checkIfInteractive(e.target)) {
       setIsInteractiveElement(true);
       return;
     }
 
-    const shouldStart = !isDragable || e.ctrlKey;
-    if (shouldStart) {
+    // Solo iniciar el arrastre si isDragable es false o si Ctrl está presionado
+    if (!isDragable || e.ctrlKey) {
       setIsInteractiveElement(false);
       setIsDragging(true);
       setStartX(e.pageX - containerRef.current.offsetLeft);
@@ -66,23 +69,21 @@ const ScrollableComponent = ({
       setScrollLeft(containerRef.current.scrollLeft);
       setScrollTop(containerRef.current.scrollTop);
 
-      if (isDragable && e.ctrlKey) {
-        setIsCtrlDragging(true);
-        if (onCtrlDragChange) onCtrlDragChange(true);
-      }
-
       if (onDragStart) onDragStart(e);
+
       e.preventDefault();
     }
-  }, [checkIfInteractive, onDragStart, isDragable, onCtrlDragChange]);
+  }, [checkIfInteractive, onDragStart, isDragable]);
 
+  // Mover durante el arrastre
   const handleMouseMove = useCallback((e) => {
     if (!isDragging || isInteractiveElement) return;
 
+    // Solo permitir el movimiento si isDragable es false o si Ctrl está presionado
     if (!isDragable || e.ctrlKey) {
       if (horizontalScroll) {
         const x = e.pageX - containerRef.current.offsetLeft;
-        const walkX = (x - startX) * 1.2;
+        const walkX = (x - startX) * 1.2; // Multiplicador para ajustar sensibilidad
         containerRef.current.scrollLeft = scrollLeft - walkX;
       }
       if (verticalScroll) {
@@ -90,17 +91,10 @@ const ScrollableComponent = ({
         const walkY = (y - startY) * 1.2;
         containerRef.current.scrollTop = scrollTop - walkY;
       }
-      if (onDrag) onDrag(e);
 
-      if (isDragable && e.ctrlKey && !isCtrlDragging) {
-        setIsCtrlDragging(true);
-        if (onCtrlDragChange) onCtrlDragChange(true); 
-      } else if (isDragable && !e.ctrlKey && isCtrlDragging) {
-        setIsCtrlDragging(false);
-        if (onCtrlDragChange) onCtrlDragChange(false); 
-      }
+      if (onDrag) onDrag(e);
     }
-  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag, isDragable, onCtrlDragChange, isCtrlDragging]);
+  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag, isDragable]);
 
   const resetPosition = useCallback(() => {
     if (containerRef.current) {
@@ -109,22 +103,20 @@ const ScrollableComponent = ({
     }
   }, []);
 
+  // Finalizar el arrastre
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-
-    if (isCtrlDragging) {
-      setIsCtrlDragging(false);
-      if (onCtrlDragChange) onCtrlDragChange(false);
-    }
     if (onDragEnd) onDragEnd();
-  }, [onDragEnd, isCtrlDragging, onCtrlDragChange]);
+  }, [onDragEnd]);
 
+  // Prevenir el comportamiento predeterminado del clic derecho durante el arrastre
   const handleContextMenu = useCallback((e) => {
     if (isDragging) {
       e.preventDefault();
     }
   }, [isDragging]);
 
+  // Configurar y limpiar event listeners
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -140,18 +132,21 @@ const ScrollableComponent = ({
     };
   }, [handleMouseMove, handleMouseUp, handleContextMenu]);
 
+  // Estilos dinámicos
   const scrollStyle = {
     overflowX: horizontalScroll ? 'auto' : 'hidden',
     overflowY: verticalScroll ? 'auto' : 'hidden',
     userSelect: 'none',
   };
 
+
+  //Function for pass functions to be triggered on father
   useImperativeHandle(childRef, () => {
     return {
       resetPosition,
-      isCtrlDragging 
     };
-  }, [resetPosition, isCtrlDragging]);
+  }, [resetPosition]);
+
 
   return (
     <div
