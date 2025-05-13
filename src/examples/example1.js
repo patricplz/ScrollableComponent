@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import ScrollableComponent from '../ScrollableTest';
+import ScrollableComponent from '../ScrollableComponent';
 import '../output.css';
 
 const Example1 = () => {
@@ -22,9 +22,6 @@ const Example1 = () => {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-
-  const [isCtrlDraggingFromChild, setIsCtrlDraggingFromChild] = useState(false);
-
  const handleCtrlDragChange = (isCtrlDragging) => {
     if (isCtrlDragging) {
       console.log('¡El usuario está arrastrando con Ctrl!');
