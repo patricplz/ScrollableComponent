@@ -12,7 +12,6 @@ import { useState, useRef, useCallback, useEffect } from 'react';
  * @param {function} props.onDrag - Función que se ejecuta durante el arrastre.
  * @param {function} props.onDragEnd - Función que se ejecuta al finalizar el arrastre.
  * @param {React.Ref} props.childRef - Ref para acceder a métodos del componente hijo desde el padre.
- * @param {boolean} props.isDragable - Controla si el arrastre solo funciona con la tecla Ctrl.
  * @returns {JSX.Element} Componente ScrollableComponent.
  */
 const ScrollableComponent = ({
@@ -24,7 +23,6 @@ const ScrollableComponent = ({
   onDrag,
   onDragEnd,
   childRef,
-  isDragable = false,
   onCtrlDragChange 
 }) => {
   const containerRef = useRef(null);
@@ -57,8 +55,7 @@ const ScrollableComponent = ({
       return;
     }
 
-    const shouldStart = !isDragable || e.ctrlKey;
-    if (shouldStart) {
+    if (e.ctrlKey) {
       setIsInteractiveElement(false);
       setIsDragging(true);
       setStartX(e.pageX - containerRef.current.offsetLeft);
@@ -66,7 +63,7 @@ const ScrollableComponent = ({
       setScrollLeft(containerRef.current.scrollLeft);
       setScrollTop(containerRef.current.scrollTop);
 
-      if (isDragable && e.ctrlKey) {
+      if (e.ctrlKey) {
         setIsCtrlDragging(true);
         if (onCtrlDragChange) onCtrlDragChange(true);
       }
@@ -74,12 +71,12 @@ const ScrollableComponent = ({
       if (onDragStart) onDragStart(e);
       e.preventDefault();
     }
-  }, [checkIfInteractive, onDragStart, isDragable, onCtrlDragChange]);
+  }, [checkIfInteractive, onDragStart, onCtrlDragChange]);
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging || isInteractiveElement) return;
 
-    if (!isDragable || e.ctrlKey) {
+    if (e.ctrlKey) {
       if (horizontalScroll) {
         const x = e.pageX - containerRef.current.offsetLeft;
         const walkX = (x - startX) * 1.2;
@@ -92,15 +89,15 @@ const ScrollableComponent = ({
       }
       if (onDrag) onDrag(e);
 
-      if (isDragable && e.ctrlKey && !isCtrlDragging) {
+      if (e.ctrlKey && !isCtrlDragging) {
         setIsCtrlDragging(true);
         if (onCtrlDragChange) onCtrlDragChange(true); 
-      } else if (isDragable && !e.ctrlKey && isCtrlDragging) {
+      } else if (!e.ctrlKey && isCtrlDragging) {
         setIsCtrlDragging(false);
         if (onCtrlDragChange) onCtrlDragChange(false); 
       }
     }
-  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag, isDragable, onCtrlDragChange, isCtrlDragging]);
+  }, [isDragging, isInteractiveElement, startX, startY, scrollLeft, scrollTop, verticalScroll, onDrag, onCtrlDragChange, isCtrlDragging]);
 
   const resetPosition = useCallback(() => {
     if (containerRef.current) {
@@ -133,18 +130,30 @@ const ScrollableComponent = ({
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('contextmenu', handleContextMenu);
 
+    if (isDragging) {
+      container.querySelectorAll('*').forEach(el => {
+        el.style.cursor = 'grabbing';
+      });
+      container.style.cursor = 'grabbing';
+    } else {
+      container.querySelectorAll('*').forEach(el => {
+        el.style.cursor = '';
+      });
+      container.style.cursor = '';
+    }
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('contextmenu', handleContextMenu);
     };
-  }, [handleMouseMove, handleMouseUp, handleContextMenu]);
+  }, [handleMouseMove, handleMouseUp, handleContextMenu, isDragging]);
 
   const scrollStyle = {
     overflowX: horizontalScroll ? 'auto' : 'hidden',
     overflowY: verticalScroll ? 'auto' : 'hidden',
-    userSelect: 'none',
-    cursor: isDragging ? 'grabbing' : 'default'
+    // userSelect: 'none',
+    // cursor: isDragging ? 'grabbing' : 'default'
   };
 
   useImperativeHandle(childRef, () => {

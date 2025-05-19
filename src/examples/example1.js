@@ -41,7 +41,6 @@ const Example1 = () => {
           className="max-h-[300px]"
           horizontalScroll={true}
           verticalScroll={true}
-          isDragable={true}
           onCtrlDragChange={handleCtrlDragChange}
         >
           <table className="w-full">
