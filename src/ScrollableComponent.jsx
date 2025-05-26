@@ -152,8 +152,7 @@ const ScrollableComponent = ({
   const scrollStyle = {
     overflowX: horizontalScroll ? 'auto' : 'hidden',
     overflowY: verticalScroll ? 'auto' : 'hidden',
-    // userSelect: 'none',
-    // cursor: isDragging ? 'grabbing' : 'default'
+
   };
 
   useImperativeHandle(childRef, () => {
