@@ -23,7 +23,8 @@ const ScrollableComponent = ({
   onDrag,
   onDragEnd,
   childRef,
-  onCtrlDragChange 
+  onCtrlDragChange,
+  onScroll
 }) => {
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -148,6 +149,27 @@ const ScrollableComponent = ({
       document.removeEventListener('contextmenu', handleContextMenu);
     };
   }, [handleMouseMove, handleMouseUp, handleContextMenu, isDragging]);
+
+
+
+  useEffect(() => {
+    const div = containerRef.current;
+    if (!div) return;
+
+    const handleScroll = (e) => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      if (onScroll) onScroll(e);
+    };
+
+    div.addEventListener('scroll', handleScroll);
+
+    return () => {
+      div.removeEventListener('scroll', handleScroll);
+    };
+  }, [onScroll]);
+
 
   const scrollStyle = {
     overflowX: horizontalScroll ? 'auto' : 'hidden',
